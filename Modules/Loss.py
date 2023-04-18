@@ -40,7 +40,7 @@ class SampledCrossEntropyLoss(nn.Module):
         self.useCuda = useCuda
 
     def forward(self, input, target=None):
-        if(terget is None):
+        if(target is None):
             batchSize = input.shape[0]
             target = Variable(torch.arange(batchSize).long())
             if self.useCuda:
