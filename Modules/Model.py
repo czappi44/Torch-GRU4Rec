@@ -81,6 +81,8 @@ class GRU4Rec(nn.Module):
             self.finalAct = nn.ELU(alpha=float(finalAct.split('-')[1]))
         elif finalAct.startswith('leaky-'):
             self.finalAct = nn.LeakyReLU(negative_slope=float(finalAct.split('-')[1]))
+        elif finalAct == 'linear':
+            self.finalAct = nn.Identity()
 
     def forward(self, input, hidden, target=None):
         
