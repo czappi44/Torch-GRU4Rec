@@ -24,14 +24,16 @@ class Trainer(object):
             st = time.time()
             print('Start Epoch #', epoch)
             
-            trainLoss = self.trainEpoch(epoch)
-            validLoss, recall, mrr = self.evalutor.evalute(self.validGenerator)
-            
-            print("Epoch: {}, train loss: {:.4f}, validloss: {:.4f}, recall: {:.4f}, mrr: {:.4f}, time: {}".format(epoch, trainLoss, validLoss, recall, mrr, time.time() - st))
+            trainLoss, events = self.trainEpoch(epoch)
+            # validLoss, recall, mrr = self.evalutor.evalute(self.validGenerator)
+            validLoss, recall, mrr = None, None, None
+            epoch_duration = time.time() - st
+            print(f'epoch:{epoch} loss: {trainLoss:.6f} {epoch_duration:.2f} s {np.sum(events)/epoch_duration:.2f} e/s {len(events)/epoch_duration:.2f} mb/s')
             self.saveModel(epoch, validLoss, trainLoss, recall, mrr) 
 
     def trainEpoch(self, epoch):
         losses = []
+        events = []
         self.model.train()
         batchSize = float(self.trainGenerator.batchSize)
         hidden = self.model.initHidden(batchSize)
@@ -52,6 +54,7 @@ class Trainer(object):
                 loss = self.lossFunc(logit, target)
                 
             loss = (float(len(input)) / batchSize) * loss
+            events.append(len(input))
             
             if(~np.isnan(loss.item())):
                 losses.append(loss.item())
@@ -60,7 +63,7 @@ class Trainer(object):
                 self.optim.zero_grad()
             
         meanLoss = np.mean(losses)
-        return meanLoss
+        return meanLoss, events
     
     def saveModel(self, epoch, validLoss, trainLoss, recall, mrr):
         checkPoints = {
