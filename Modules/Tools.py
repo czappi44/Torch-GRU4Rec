@@ -9,14 +9,7 @@ def saveParams(resultDir, inputSize, outputSize, lossType, finalAct, nLayers, hi
                itemKey, timeKey, cuda):
     now = datetime.datetime.now()
     S = '{:02d}-{};{:02d}.{:02d}'.format(now.day, now.strftime("%B"), now.hour, now.minute)
-    
-    if not os.path.exists(resultDir):
-        os.mkdir(resultDir)        
-        
-    resultDir = os.path.join(resultDir, S)
-    if not os.path.exists(resultDir):
-        os.mkdir(resultDir)
-        
+
     file = open(os.path.join(resultDir, 'networkParams'), "w");
     file.write("inputSize=" + str(inputSize) + "\n");
     file.write("outputSize=" + str(outputSize) + "\n");
@@ -66,8 +59,8 @@ def fitAndEvalute(trainDataSet, validDataSet, resultDir, inputSize, outputSize, 
     
     trainGenerator = Dataset.DataGenerator(trainDataSet, batchSize=batchSize, nSample=trainNSample,
                                            sampleAlpha=sampleAlpha, timeSort=timeSort, trainRandomOrder=trainRandomOrder)
-    validGenerator = Dataset.DataGenerator(validDataSet, batchSize=batchSize, nSample=validNSample,
-                                           sampleAlpha=sampleAlpha, timeSort=timeSort, trainRandomOrder=trainRandomOrder)
+    
+    validGenerator = None
     
     # Initialize the model
     model = Model.GRU4Rec(inputSize=inputSize, outputSize=outputSize, hiddenSize=hiddenSize,
